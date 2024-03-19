@@ -130,6 +130,22 @@ TRACE_DEFINE_ENUM(CP_RESIZE);
 		{ CP_TRIMMED,	"Trimmed" },				\
 		{ CP_RESIZE,	"Resize" })
 
+#ifdef CONFIG_F2FS_CP_OPT
+#define show_fsync_cpreason(type)					\
+	__print_symbolic(type,						\
+		{ CP_NO_NEEDED,		"no needed" },			\
+		{ CP_NON_REGULAR,	"non regular" },		\
+		{ CP_COMPRESSED,	"compressed" },			\
+		{ CP_HARDLINK,		"hardlink" },			\
+		{ CP_SB_NEED_CP,	"sb needs cp" },		\
+		{ CP_WRONG_PINO,	"wrong pino" },			\
+		{ CP_NO_SPC_ROLL,	"no space roll forward" },	\
+		{ CP_NODE_NEED_CP,	"node needs cp" },		\
+		{ CP_FASTBOOT_MODE,	"fastboot mode" },		\
+		{ CP_SPEC_LOG_NUM,	"log type is 2" },		\
+		{ CP_RECOVER_DIR,	"dir needs recovery" },	\
+		{ CP_PARENT_XATTR_SET,	"parent xattr is set" })
+#else
 #define show_fsync_cpreason(type)					\
 	__print_symbolic(type,						\
 		{ CP_NO_NEEDED,		"no needed" },			\
@@ -143,6 +159,7 @@ TRACE_DEFINE_ENUM(CP_RESIZE);
 		{ CP_FASTBOOT_MODE,	"fastboot mode" },		\
 		{ CP_SPEC_LOG_NUM,	"log type is 2" },		\
 		{ CP_RECOVER_DIR,	"dir needs recovery" })
+#endif
 
 #define show_shutdown_mode(type)					\
 	__print_symbolic(type,						\
@@ -327,7 +344,7 @@ TRACE_EVENT(f2fs_unlink_enter,
 		__field(ino_t,	ino)
 		__field(loff_t,	size)
 		__field(blkcnt_t, blocks)
-		__field(const char *,	name)
+		__string(name, dentry->d_name.name)
 	),
 
 	TP_fast_assign(
@@ -335,7 +352,7 @@ TRACE_EVENT(f2fs_unlink_enter,
 		__entry->ino	= dir->i_ino;
 		__entry->size	= dir->i_size;
 		__entry->blocks	= dir->i_blocks;
-		__entry->name	= dentry->d_name.name;
+		__assign_str(name, dentry->d_name.name);
 	),
 
 	TP_printk("dev = (%d,%d), dir ino = %lu, i_size = %lld, "
@@ -343,7 +360,7 @@ TRACE_EVENT(f2fs_unlink_enter,
 		show_dev_ino(__entry),
 		__entry->size,
 		(unsigned long long)__entry->blocks,
-		__entry->name)
+		__get_str(name))
 );
 
 DEFINE_EVENT(f2fs__inode_exit, f2fs_unlink_exit,
@@ -804,7 +821,7 @@ TRACE_EVENT(f2fs_lookup_start,
 	TP_STRUCT__entry(
 		__field(dev_t,	dev)
 		__field(ino_t,	ino)
-		__string(name,	dentry->d_name.name)
+		__string(name, dentry->d_name.name)
 		__field(unsigned int, flags)
 	),
 
@@ -831,7 +848,7 @@ TRACE_EVENT(f2fs_lookup_end,
 	TP_STRUCT__entry(
 		__field(dev_t,	dev)
 		__field(ino_t,	ino)
-		__string(name,	dentry->d_name.name)
+		__string(name, dentry->d_name.name)
 		__field(nid_t,	cino)
 		__field(int,	err)
 	),
