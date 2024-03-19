@@ -405,6 +405,19 @@ config BATTERY_TWL4030_MADC
 	  Say Y here to enable this dumb driver for batteries managed
 	  through the TWL4030 MADC.
 
+config QTI_BATTERY_CHARGER
+	tristate "QTI Glink battery charger"
+	depends on QTI_PMIC_GLINK && EXTCON
+	help
+	  Say Y here to enable Qualcomm Technologies, Inc. battery charger
+	  driver which interfaces with the charger firmware running on the
+	  remote subsystem (e.g. DSP) by communicating over PMIC Glink channel
+	  and provides information about the battery, USB and wireless charging
+	  by exposing them as power supply devices.
+
+	  To compile the driver as a module, choose M here: the module will be
+	  called qti_battery_charger.
+
 config CHARGER_88PM860X
 	tristate "Marvell 88PM860x Charger driver"
 	depends on MFD_88PM860X && BATTERY_88PM860X
@@ -597,6 +610,38 @@ config CHARGER_BQ25890
 	help
 	  Say Y to enable support for the TI BQ25890 battery charger.
 
+config CHARGER_SC8551
+	tristate "SC8551 Divider Charger Driver"
+	depends on I2C
+	default n
+	help
+	  Say Y here to enable support of sc8551 divider charger
+	  It is mainly used as divider charger for
+	  direct charge
+
+config CHARGER_LN8000
+	tristate "LN8000 Divider Charger Driver"
+	depends on I2C
+	default n
+	help
+	  Say Y here to enable support of ln8000 divider charger
+	  It is mainly used as divider charger for
+	  direct charge
+
+config CHARGER_PD_MANAGER
+	tristate "PD policy manager"
+	default n
+	help
+	  Say Y here to enable support of pd manager
+	  It is mainly used as divider charger for
+	  direct charge
+
+config SM5602_FG
+	tristate "sm5602 fg"
+	default n
+	help
+	  Say Y to enable support for SM5602 fuel gauge
+
 config CHARGER_SMB347
 	tristate "Summit Microelectronics SMB347 Battery Charger"
 	depends on I2C
@@ -702,6 +747,12 @@ config CHARGER_BD70528
 	 information and altering charger configurations from charger
 	 block of the ROHM BD70528 Power Management IC.
 
+config HQ_CHARGER_MANAGER
+	tristate "hq charger manager"
+	default n
+	help
+	 Say Y enable hq charger manager
+
 config CHARGER_WILCO
 	tristate "Wilco EC based charger for ChromeOS"
 	depends on WILCO_EC
@@ -710,5 +761,8 @@ config CHARGER_WILCO
 	  by the Embedded Controller on the Chromebook named Wilco. Further
 	  information can be found in
 	  Documentation/ABI/testing/sysfs-class-power-wilco
+
+source "drivers/power/supply/qcom/Kconfig"
+source "drivers/power/supply/battery_secrete/Kconfig"
 
 endif # POWER_SUPPLY
